@@ -4,3 +4,9 @@ The objective of this project is to identify common side effects of multiple dru
 - A comprehensive review of the literature will be conducted to gather information on the side effects of multiple drugs.
 - Data on side effects will be collected from a variety of sources, including peer-reviewed articles, drug labels, and online databases.
 - Statistical analysis will be used to identify common side effects that occur across multiple drugs.
+
+Project Outcomes:
+
+- The project will provide a comprehensive overview of the common side effects of multiple drugs.
+- The results of the analysis will be disseminated through website or online publication.
+- The findings of this project may inform treatment decisions and help healthcare providers and patients to identify potential adverse reactions.
