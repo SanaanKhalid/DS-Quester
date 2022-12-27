@@ -1,0 +1,46 @@
+package parseTest;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class TSVParser2 {
+    public static void main(String[] args) {
+   String fileName = "C:\\\\Users\\\\sanaa\\\\Computer Science\\\\Common-SideEffects\\\\TSVParser\\\\DS Quester TSV Parser\\\\src\\\\parseTest\\\\drug_names.tsv"; 
+   
+   	System.out.print(findDrugID(fileName, "biguanide"));
+   
+   
+}
+    
+    
+   
+       
+    	
+    public static String findDrugID(String fileName, String drugName) {
+    	Map<String, String> data = new HashMap<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] cells = line.split("\t");
+                data.put(cells[1], cells[0]);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Print the contents of the file
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+           if(entry.getKey() == drugName) {
+        	  System.out.println(entry.getKey() + ": " + entry.getValue());
+        	  return entry.getValue();
+           }
+        }
+		return "Drug not Found";
+    }
+  }
+    
+

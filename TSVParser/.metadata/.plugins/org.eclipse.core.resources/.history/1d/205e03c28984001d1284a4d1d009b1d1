@@ -1,0 +1,29 @@
+package parseTest;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class TSVParser2 {
+    public static void main(String[] args) {
+        String fileName = "drug_names.tsv"; // Replace with your own file name
+        Map<String, String> data = new HashMap<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] cells = line.split("\t");
+                data.put(cells[0], cells[1]);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Print the contents of the file
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+    }
+}
