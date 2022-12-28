@@ -1,0 +1,32 @@
+package parseTest;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+
+	public static void main(String[] args) {
+        String fileName = "C:\\Users\\sanaa\\Computer Science\\Common-SideEffects\\TSVParser\\DS Quester TSV Parser\\src\\parseTest\\drug_names.tsv"; // Replace with your own file name
+        List<String[]> rows = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                rows.add(line.split("\t"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Print the contents of the file
+        for (String[] row : rows) {
+            for (String cell : row) {
+                System.out.print(cell + "\t");
+            }
+            System.out.println();
+        }
+    }
+}
