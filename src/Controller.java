@@ -82,6 +82,8 @@ public class Controller {
             sideEffectList.add(entry);
         }
         // compare the two lists
+        // TODO:
+        // if (contains("LT"))
         for (int x = 0; x < drugList.size(); x++) {
             for(int y = 0; y < sideEffectList.size(); y++) {
                 if (sideEffectList.get(y).split(",")[0] == drugList.get(x).split(", ")[1] &&
