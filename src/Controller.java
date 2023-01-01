@@ -51,13 +51,16 @@ public class Controller {
 
     /**
      * populates the drug side effect assignment table based on the similar attributes in the files
+     *
      * @throws IOException
      */
     public static void populateAssignmentTable() throws IOException {
-        String meddraFilePath = "Tailored .csv Files/meddra_all_se.csv";
+        // String meddraFilePath = "Tailored .csv Files/meddra_all_se.csv";
+        String meddraFilePath = ".csv/AllMeddra.csv";
         // code sourced from: https://stackoverflow.com/questions/18009416/how-to-count-total-rows-in-csv-using-java
         BufferedReader bufferedReaderMeddra = new BufferedReader(new FileReader(meddraFilePath));
-        String seFilePath = "Tailored .csv Files/side_effect.csv";
+        // String seFilePath = "Tailored .csv Files/side_effect.csv";
+        String seFilePath = ".csv/SideEffectTable.csv";
         BufferedReader bufferedReaderSE = new BufferedReader(new FileReader(seFilePath));
 
         String row;
@@ -85,10 +88,11 @@ public class Controller {
         // TODO:
         // if (contains("LT"))
         for (int x = 0; x < drugList.size(); x++) {
-            for(int y = 0; y < sideEffectList.size(); y++) {
+            for (int y = 0; y < sideEffectList.size(); y++) {
                 if (sideEffectList.get(y).split(",")[0] == drugList.get(x).split(", ")[1] &&
                         sideEffectList.get(y).split(",")[1] == drugList.get(x).split(", ")[2]) {
-                    System.out.println("match!");
+                    System.out.println("Match! Drug ID = " + drugList.get(x).split(", ")[0] + ", Side Effect: " +
+                            sideEffectList.get(y).split(", ")[0] + ", " + sideEffectList.get(y).split(", ")[1]);
                     // values below will be used to populate the assignment table
                     String drugIdVal = drugList.get(x).split(", ")[2];
                     String seVal = sideEffectList.get(y).split(",")[1];
