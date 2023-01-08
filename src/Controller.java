@@ -9,7 +9,7 @@ public class Controller {
     public static void main(String[] args) throws SQLException {
         try {
             Connection dsquesterConn = dbConnection();
-            populateAssignmentTable();
+            populateAssignmentTable(dsquesterConn);
             //String query = "";
             //executeQuery(query, dsquesterConn);
         } catch (Exception e) {
@@ -32,21 +32,21 @@ public class Controller {
     }
 
     // CODE BELOW IS NOT IN USE YET
-//    /**
-//     * @param query    is the chosen SQL query
-//     * @param dsqConnn is the connection to the database
-//     * @throws SQLException
-//     */
-//    public static void executeQuery(String query, Connection dsqConnn) throws SQLException {
-//        PreparedStatement statement = dsqConnn.prepareStatement(query);
-//        ResultSet results = statement.executeQuery();
-//        while (results.next()) {
-//            for (int x = 1; x <= results.getMetaData().getColumnCount(); x++) {
-//                System.out.print("Data imported.");
-//            }
-//            System.out.println();
-//        }
-//    }
+    /**
+     * @param query    is the chosen SQL query
+     * @param dsquesterConn is the connection to the database
+     * @throws SQLException
+     */
+    public static void executeQuery(String query, Connection dsquesterConn) throws SQLException {
+        PreparedStatement statement = dsquesterConn.prepareStatement(query);
+        ResultSet results = statement.executeQuery();
+        while (results.next()) {
+            for (int x = 1; x <= results.getMetaData().getColumnCount(); x++) {
+                System.out.print("Data imported.");
+            }
+            System.out.println();
+        }
+    }
 
 
     /**
@@ -54,12 +54,10 @@ public class Controller {
      *
      * @throws IOException
      */
-    public static void populateAssignmentTable() throws IOException {
-        // String meddraFilePath = "Tailored .csv Files/meddra_all_se.csv";
+    public static void populateAssignmentTable(Connection dsquesterConn) throws IOException, SQLException {
         String meddraFilePath = ".csv/AllMeddra.csv";
         // code sourced from: https://stackoverflow.com/questions/18009416/how-to-count-total-rows-in-csv-using-java
         BufferedReader bufferedReaderMeddra = new BufferedReader(new FileReader(meddraFilePath));
-        // String seFilePath = "Tailored .csv Files/side_effect.csv";
         String seFilePath = ".csv/SideEffectTable.csv";
         BufferedReader bufferedReaderSE = new BufferedReader(new FileReader(seFilePath));
 
@@ -86,18 +84,37 @@ public class Controller {
         }
         // compare the two lists
         // TODO:
+        // ignore cap case, ignore spaces
+        // smaller dataset
         // if (contains("LT"))
         for (int x = 0; x < drugList.size(); x++) {
             for (int y = 0; y < sideEffectList.size(); y++) {
-                if (sideEffectList.get(y).split(",")[0] == drugList.get(x).split(", ")[1] &&
-                        sideEffectList.get(y).split(",")[1] == drugList.get(x).split(", ")[2]) {
+
+
+
+
+                // if the TERMINOLOGY FORMAT matches and if the side effect matches
+                if ((sideEffectList.get(y).split(", ")[0].equalsIgnoreCase(drugList.get(x).split(", ")[1]) &&
+                        sideEffectList.get(y).split(", ")[1].equalsIgnoreCase(drugList.get(x).split(", ")[2])) ||
+
+                        // or if it's comparing LLT and LT  (which are the same) and if the side effect matches
+                        (sideEffectList.get(y).split(", ")[1].equalsIgnoreCase("LLT") &&
+                                drugList.get(x).split(", ")[2].equalsIgnoreCase("LT") &&
+                                sideEffectList.get(y).split(", ")[1].equalsIgnoreCase(drugList.get(x).split(", ")[2]))) {
+
+                    // print out the drug id, and side effect and  its terminology format
                     System.out.println("Match! Drug ID = " + drugList.get(x).split(", ")[0] + ", Side Effect: " +
                             sideEffectList.get(y).split(", ")[0] + ", " + sideEffectList.get(y).split(", ")[1]);
+
                     // values below will be used to populate the assignment table
                     String drugIdVal = drugList.get(x).split(", ")[2];
-                    String seVal = sideEffectList.get(y).split(",")[1];
-                    // more code needed in order to populate data.
+                    String seVal = sideEffectList.get(y).split(", ")[1];
+                    String populateQuery = "INSERT INTO drug_se_assignment VALUES (\"" + drugIdVal + "\", \"" + seVal + "\");";
+
+                    // send query to method to populate table
+                    executeQuery(populateQuery, dsquesterConn);
                 }
+                // end of if statement
             }
         }
     }
