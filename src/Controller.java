@@ -2,7 +2,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
-import java.io.File;
 import java.util.ArrayList;
 
 public class Controller {
@@ -10,8 +9,7 @@ public class Controller {
         try {
             Connection dsquesterConn = dbConnection();
             populateAssignmentTable(dsquesterConn);
-            //String query = "";
-            //executeQuery(query, dsquesterConn);
+            // executeQuery(query, dsquesterConn);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -31,23 +29,17 @@ public class Controller {
         return dsquesterConn;
     }
 
-    // CODE BELOW IS NOT IN USE YET
     /**
-     * @param query    is the chosen SQL query
+     * @param query         is the chosen SQL query
      * @param dsquesterConn is the connection to the database
      * @throws SQLException
      */
     public static void executeQuery(String query, Connection dsquesterConn) throws SQLException {
         PreparedStatement statement = dsquesterConn.prepareStatement(query);
-        ResultSet results = statement.executeQuery();
-        while (results.next()) {
-            for (int x = 1; x <= results.getMetaData().getColumnCount(); x++) {
-                System.out.print("Data imported.");
-            }
-            System.out.println();
-        }
+        int rowCount = statement.executeUpdate();
+        System.out.println();
+        System.out.println("Success - " + rowCount + " rows affected.");
     }
-
 
     /**
      * populates the drug side effect assignment table based on the similar attributes in the files
@@ -65,6 +57,7 @@ public class Controller {
         String drugId;
         String terminologyFormat;
         String sideEffect;
+        String seId;
         ArrayList<String> drugList = new ArrayList<String>();
         while ((row = bufferedReaderMeddra.readLine()) != null) {
             String[] columns = row.split(",");
@@ -77,29 +70,25 @@ public class Controller {
         ArrayList<String> sideEffectList = new ArrayList<String>();
         while ((row = bufferedReaderSE.readLine()) != null) {
             String[] columns = row.split(",");
-            sideEffect = columns[1];
+            sideEffect = columns[4];
+            seId = columns[0];
             terminologyFormat = columns[2];
-            String entry = terminologyFormat + ", " + sideEffect;
+            String entry = terminologyFormat + ", " + sideEffect + ", " + seId;
             sideEffectList.add(entry);
         }
-        // compare the two lists
-        // TODO:
-        // ignore cap case, ignore spaces
-        // smaller dataset
-        // if (contains("LT"))
+
+        //side effect entry: LT, Abdominal pain
+        // drug list entry: drug id, LLT, abdominal pain
         for (int x = 0; x < drugList.size(); x++) {
             for (int y = 0; y < sideEffectList.size(); y++) {
-
-
-
 
                 // if the TERMINOLOGY FORMAT matches and if the side effect matches
                 if ((sideEffectList.get(y).split(", ")[0].equalsIgnoreCase(drugList.get(x).split(", ")[1]) &&
                         sideEffectList.get(y).split(", ")[1].equalsIgnoreCase(drugList.get(x).split(", ")[2])) ||
 
                         // or if it's comparing LLT and LT  (which are the same) and if the side effect matches
-                        (sideEffectList.get(y).split(", ")[1].equalsIgnoreCase("LLT") &&
-                                drugList.get(x).split(", ")[2].equalsIgnoreCase("LT") &&
+                        (sideEffectList.get(y).split(", ")[0].equalsIgnoreCase("LT") &&
+                                drugList.get(x).split(", ")[1].equalsIgnoreCase("LLT") &&
                                 sideEffectList.get(y).split(", ")[1].equalsIgnoreCase(drugList.get(x).split(", ")[2]))) {
 
                     // print out the drug id, and side effect and  its terminology format
@@ -107,15 +96,29 @@ public class Controller {
                             sideEffectList.get(y).split(", ")[0] + ", " + sideEffectList.get(y).split(", ")[1]);
 
                     // values below will be used to populate the assignment table
-                    String drugIdVal = drugList.get(x).split(", ")[2];
-                    String seVal = sideEffectList.get(y).split(", ")[1];
-                    String populateQuery = "INSERT INTO drug_se_assignment VALUES (\"" + drugIdVal + "\", \"" + seVal + "\");";
+                    String drugIdVal = drugList.get(x).split(", ")[0];
+                    int seIdVal = Integer.parseInt(sideEffectList.get(y).split(", ")[2]);
 
-                    // send query to method to populate table
-                    executeQuery(populateQuery, dsquesterConn);
+                    String populateQuery = "INSERT INTO drug_se_assignment VALUES (\"" + drugIdVal + "\", " + seIdVal + ");";
+                    System.out.println(populateQuery);
+                    try {
+                        // send query to method to populate table
+                        executeQuery(populateQuery, dsquesterConn);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    // end of if statement
                 }
-                // end of if statement
             }
         }
     }
 }
+
+
+// reimport the drug data (mixed values)
+// reimport the side effect data (only a few values are present)
+// foreign key issue
+// data truncation
+// Data truncation: Data too long for column 'drug_id' at row 1
+// Match! Drug ID = CID100000085, Side Effect: LT, Abdominal cramps
+//INSERT INTO drug_se_assignment VALUES ("CID100000085", 1000005);
